@@ -15,6 +15,10 @@ export const pool =
   globalForDb.__arenaNextJsPostgresqlPool ??
   new Pool({
     connectionString: databaseUrl,
+    // Add this block to allow Vercel to securely trust the Supabase certificate
+    ssl: {
+      rejectUnauthorized: false,
+    },
   });
 
 if (process.env.NODE_ENV !== "production") {
