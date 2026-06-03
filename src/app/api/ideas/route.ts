@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-// FIXED: Switched from path aliases to relative paths to resolve Vercel compilation errors
+// FIXED: Using relative paths to safely resolve modules inside Vercel's build container
 import { db } from "../../db";
 import { ideas, users, upvotes } from "../../db/schema";
 import { auth } from "@/auth";
-import { desc, eq, sql, ilike, or } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 // GET all ideas with optional search and tag filtering
 export async function GET(request: NextRequest) {
@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
         id: ideas.id,
         title: ideas.title,
         teaser: ideas.teaser,
+        // FIXED: Matched to the exact schema properties defined in your schema.ts
         fullStrategy: ideas.fullStrategy,
         tags: ideas.tags,
         teamRoles: ideas.teamRoles,
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     if (tag) {
       filteredResults = filteredResults.filter((idea) =>
-        (idea.tags as string[])?.includes(tag)
+        idea.tags?.includes(tag)
       );
     }
 
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
         teaser,
         fullStrategy,
         tags: tags || [],
-        teamRoles,
+        teamRoles: teamRoles || [],
         upvoteCount: 0,
       })
       .returning();
