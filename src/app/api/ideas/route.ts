@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-// FIXED: Using relative paths to safely resolve modules inside Vercel's build container
-import { db } from "../../db";
-import { ideas, users, upvotes } from "../../db/schema";
-import { auth } from "@/auth";
+import { db } from "../../../db";
+import { ideas, users } from "../../../db/schema";
+import { auth } from "../../../auth"; // Adjusted step back to reach src/auth safely
 import { desc, eq } from "drizzle-orm";
 
 // GET all ideas with optional search and tag filtering
@@ -17,7 +16,6 @@ export async function GET(request: NextRequest) {
         id: ideas.id,
         title: ideas.title,
         teaser: ideas.teaser,
-        // FIXED: Matched to the exact schema properties defined in your schema.ts
         fullStrategy: ideas.fullStrategy,
         tags: ideas.tags,
         teamRoles: ideas.teamRoles,
@@ -33,7 +31,6 @@ export async function GET(request: NextRequest) {
 
     const result = await query;
 
-    // Filter on the result set for simplicity
     let filteredResults = result;
 
     if (search) {
