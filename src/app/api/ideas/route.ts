@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db";
-import { ideas, users, upvotes } from "@/db/schema";
+// FIXED: Switched from path aliases to relative paths to resolve Vercel compilation errors
+import { db } from "../../db";
+import { ideas, users, upvotes } from "../../db/schema";
 import { auth } from "@/auth";
 import { desc, eq, sql, ilike, or } from "drizzle-orm";
 
