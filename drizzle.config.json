@@ -1,8 +1,8 @@
 {
-  "schema": "./src/db/schema.ts",
+  "schema": "./src/schema.ts",
   "out": "./drizzle",
-  "driver": "pg",
+  "dialect": "postgresql",
   "dbCredentials": {
-    "connectionString": "postgresql://postgres.zgvioczpzyjaxbueuznd:o0ZOsBol1fs7sARR@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=no-verify"
+    "url": "postgresql://postgres.zgvioczpzyjaxbueuznd:o0ZOsBol1fs7sARR@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=no-verify"
   }
 }
