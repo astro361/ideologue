@@ -15,9 +15,12 @@ export const pool =
   globalForDb.__arenaNextJsPostgresqlPool ??
   new Pool({
     connectionString: databaseUrl,
-    // Add this block to allow Vercel to securely trust the Supabase certificate
+    // FIXED: Crucial configurations for serverless functions hitting a Supabase pooler
+    max: 10,                 // Prevents a single lambda instance from hogging connections
+    idleTimeoutMillis: 30000,// Closes idle connections quickly to free up space
+    connectionTimeoutMillis: 5000, // Fails fast instead of letting the lambda function time out
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: false, // Bypasses self-signed certificate restrictions on production pool
     },
   });
 
