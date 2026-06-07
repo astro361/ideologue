@@ -7,11 +7,11 @@ import { users, accounts, sessions, verificationTokens } from "@/db/schema";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  usersTable: users as any,
+  accountsTable: accounts as any,
+  sessionsTable: sessions as any,
+  verificationTokensTable: verificationTokens as any,
+}),
   session: {
     strategy: "database",
   },
