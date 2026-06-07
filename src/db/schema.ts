@@ -1,9 +1,9 @@
-import { pgTable, text, timestamp, integer, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, primaryKey, jsonb } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
-// ==========================================
-// 1. NEXTAUTH CORE TABLES (FIXED TYPE ERROR)
-// ==========================================
+// =========================================================================
+// 1. NEXTAUTH CORE TABLES (Fixed with explicit .primaryKey() requirements)
+// =========================================================================
 
 export const users = pgTable("users", {
   id: text("id")
@@ -59,9 +59,9 @@ export const verificationTokens = pgTable(
   })
 );
 
-// ==========================================
-// 2. IDEOLOGUE CORE APPLICATION TABLES
-// ==========================================
+// =========================================================================
+// 2. IDEOLOGUE CORE APPLICATION TABLES (With API matching fields)
+// =========================================================================
 
 export const ideas = pgTable("ideas", {
   id: text("id")
@@ -69,6 +69,10 @@ export const ideas = pgTable("ideas", {
     .$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
   description: text("description").notNull(),
+  teaser: text("teaser"),               // Required by /api/ideas/[id]/route.ts
+  fullStrategy: text("fullStrategy"),   // Required by /api/ideas/[id]/route.ts
+  tags: text("tags").array(),           // Required by /api/ideas/[id]/route.ts
+  teamRoles: jsonb("teamRoles"),        // Required by /api/ideas/[id]/route.ts
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
