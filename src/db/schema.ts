@@ -69,10 +69,11 @@ export const ideas = pgTable("ideas", {
     .$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  teaser: text("teaser"),               // Required by /api/ideas/[id]/route.ts
-  fullStrategy: text("fullStrategy"),   // Required by /api/ideas/[id]/route.ts
-  tags: text("tags").array(),           // Required by /api/ideas/[id]/route.ts
-  teamRoles: jsonb("teamRoles"),        // Required by /api/ideas/[id]/route.ts
+  teaser: text("teaser"),               
+  fullStrategy: text("fullStrategy"),   
+  tags: text("tags").array(),           
+  teamRoles: jsonb("teamRoles"),        
+  upvoteCount: integer("upvoteCount").default(0).notNull(), // Added to resolve route.ts:23:28
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
