@@ -1,7 +1,10 @@
 import { pgTable, text, timestamp, integer, primaryKey } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
-// 1. FIXED USERS TABLE (Added .primaryKey() and a clean UUID generator fallback)
+// ==========================================
+// 1. NEXTAUTH CORE TABLES (FIXED TYPE ERROR)
+// ==========================================
+
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
@@ -12,7 +15,6 @@ export const users = pgTable("users", {
   image: text("image"),
 });
 
-// 2. ACCOUNTS TABLE (Ensure this matches standard NextAuth types)
 export const accounts = pgTable(
   "accounts",
   {
@@ -37,7 +39,6 @@ export const accounts = pgTable(
   })
 );
 
-// 3. SESSIONS TABLE
 export const sessions = pgTable("sessions", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
@@ -45,3 +46,60 @@ export const sessions = pgTable("sessions", {
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  })
+);
+
+// ==========================================
+// 2. IDEOLOGUE CORE APPLICATION TABLES
+// ==========================================
+
+export const ideas = pgTable("ideas", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const comments = pgTable("comments", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  content: text("content").notNull(),
+  ideaId: text("ideaId")
+    .notNull()
+    .references(() => ideas.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const upvotes = pgTable(
+  "upvotes",
+  {
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    ideaId: text("ideaId")
+      .notNull()
+      .references(() => ideas.id, { onDelete: "cascade" }),
+  },
+  (upvote) => ({
+    compoundKey: primaryKey({ columns: [upvote.userId, upvote.ideaId] }),
+  })
+);
