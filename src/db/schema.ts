@@ -2,7 +2,7 @@ import { pgTable, text, timestamp, integer, primaryKey, jsonb } from "drizzle-or
 import type { AdapterAccountType } from "next-auth/adapters";
 
 // =========================================================================
-// 1. NEXTAUTH CORE TABLES (Fixed with explicit .primaryKey() requirements)
+// 1. NEXTAUTH CORE TABLES (Fixed database mappings to snake_case)
 // =========================================================================
 
 export const users = pgTable("users", {
@@ -11,19 +11,19 @@ export const users = pgTable("users", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name"),
   email: text("email").notNull().unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  emailVerified: timestamp("email_verified", { mode: "date" }), // Fixed mapping
   image: text("image"),
 });
 
 export const accounts = pgTable(
   "accounts",
   {
-    userId: text("userId")
+    userId: text("user_id") // Fixed mapping
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").$type<AdapterAccountType>().notNull(),
     provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
+    providerAccountId: text("provider_account_id").notNull(), // Fixed mapping
     refresh_token: text("refresh_token"),
     access_token: text("access_token"),
     expires_at: integer("expires_at"),
@@ -40,8 +40,8 @@ export const accounts = pgTable(
 );
 
 export const sessions = pgTable("sessions", {
-  sessionToken: text("sessionToken").primaryKey(),
-  userId: text("userId")
+  sessionToken: text("session_token").primaryKey(), // Fixed mapping
+  userId: text("user_id") // Fixed mapping
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
@@ -60,7 +60,7 @@ export const verificationTokens = pgTable(
 );
 
 // =========================================================================
-// 2. IDEOLOGUE CORE APPLICATION TABLES (With API matching fields)
+// 2. IDEOLOGUE CORE APPLICATION TABLES (Fixed database mappings to snake_case)
 // =========================================================================
 
 export const ideas = pgTable("ideas", {
@@ -70,14 +70,14 @@ export const ideas = pgTable("ideas", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   teaser: text("teaser"),               
-  fullStrategy: text("fullStrategy"),   
+  fullStrategy: text("full_strategy"), // Fixed mapping   
   tags: text("tags").array(),           
-  teamRoles: jsonb("teamRoles"),        
-  upvoteCount: integer("upvoteCount").default(0).notNull(), // Added to resolve route.ts:23:28
-  userId: text("userId")
+  teamRoles: jsonb("team_roles"), // Fixed mapping        
+  upvoteCount: integer("upvote_count").default(0).notNull(), // Fixed mapping
+  userId: text("user_id") // Fixed mapping ✅ Resolves column ideas.userId does not exist
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(), // Fixed mapping
 });
 
 export const comments = pgTable("comments", {
@@ -85,22 +85,22 @@ export const comments = pgTable("comments", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   content: text("content").notNull(),
-  ideaId: text("ideaId")
+  ideaId: text("idea_id") // Fixed mapping
     .notNull()
     .references(() => ideas.id, { onDelete: "cascade" }),
-  userId: text("userId")
+  userId: text("user_id") // Fixed mapping
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(), // Fixed mapping
 });
 
 export const upvotes = pgTable(
   "upvotes",
   {
-    userId: text("userId")
+    userId: text("user_id") // Fixed mapping
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    ideaId: text("ideaId")
+    ideaId: text("idea_id") // Fixed mapping
       .notNull()
       .references(() => ideas.id, { onDelete: "cascade" }),
   },
