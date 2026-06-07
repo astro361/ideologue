@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       filteredResults = filteredResults.filter(
         (idea) =>
           idea.title.toLowerCase().includes(searchLower) ||
-          (idea.teaser?.toLowerCase() ?? '').includes(searchLower) // FIXED: Safely handle null teasers
+          (idea.teaser?.toLowerCase() ?? '').includes(searchLower)
       );
     }
 
@@ -68,7 +68,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, teaser, fullStrategy, tags, teamRoles } = body;
+    // Added 'description' to the destructured body fields
+    const { title, description, teaser, fullStrategy, tags, teamRoles } = body;
 
     if (!title || !teaser || !fullStrategy) {
       return NextResponse.json(
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
       .values({
         userId: session.user.id,
         title,
+        description: description || teaser || "", // FIXED: Satisfies schema .notNull() requirement
         teaser,
         fullStrategy,
         tags: tags || [],
