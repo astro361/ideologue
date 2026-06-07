@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       filteredResults = filteredResults.filter(
         (idea) =>
           idea.title.toLowerCase().includes(searchLower) ||
-          idea.teaser.toLowerCase().includes(searchLower)
+          (idea.teaser?.toLowerCase() ?? '').includes(searchLower) // FIXED: Safely handle null teasers
       );
     }
 
